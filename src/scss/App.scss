@@ -1,0 +1,44 @@
+html,
+body {
+  height: 100%;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.vh-100 {
+  height: 100vh;
+}
+
+.bg-lightcyan {
+  background-color: lightcyan !important;
+}
+
+.algorithm-select-box {
+  &:hover {
+    text-decoration: none;
+    background-color: lightblue;
+    color: cornsilk;
+  }
+  text-align: center;
+  color: white;
+  width: 25vw;
+  height: 50vh;
+  min-width: 300px;
+  padding: 2%;
+  margin: 2%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  background-color: cornflowerblue;
+  box-shadow: 3px 3px 10px grey;
+  img {
+    height: 250px;
+    max-height: 25vh;
+    width: 250px;
+    max-width: 25vh;
+  }
+}
