@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import sortingIcon from './images/sortingIcon.png';
 import pathfindingIcon from './images/pathfindingIcon.png';
-import searchingIcon from './images/searchingIcon.png';
 
 const HomeView = () => {
   return (
@@ -14,10 +13,6 @@ const HomeView = () => {
       <Link to='pathfinding' className='algorithm-select-box'>
         <h2>Algorytmy szukania ścieżki</h2>
         <img src={pathfindingIcon} alt='' />
-      </Link>
-      <Link to='searching' className='algorithm-select-box'>
-        <h2>Algorytmy przeszukiwania grafów</h2>
-        <img src={searchingIcon} alt='' />
       </Link>
     </div>
   );
