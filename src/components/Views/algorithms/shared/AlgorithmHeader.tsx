@@ -4,17 +4,23 @@ import { Link } from 'react-router-dom';
 interface AlgorithmHeaderProps {
   title: string;
   children?: ReactNode;
+  onVisualize(): void;
+  onReset(): void;
 }
 
-const AlgorithmHeader = ({ title, children }: AlgorithmHeaderProps) => {
+const AlgorithmHeader = ({ title, children, onVisualize, onReset }: AlgorithmHeaderProps) => {
   return (
-    <header className='navbar text-white navbar-expand navbar-primary bg-primary'>
+    <header className='navbar text-white navbar-expand navbar-primary bg-primary form-inline'>
       <span className='navbar-brand'>{title}</span>
       <div className='border border-right-0 border-top-0 border-bottom-0 mr-auto'>
         <div className='btn'>Wprowadź dane</div>
         {children}
-        <div className='btn'>Zresetuj</div>
-        <div className='btn font-weight-bold'>Wizualizuj</div>
+        <div className='btn' onClick={onReset}>
+          Zresetuj
+        </div>
+        <div className='btn font-weight-bold' onClick={onVisualize}>
+          Wizualizuj
+        </div>
       </div>
       <Link to='/' className='btn btn-outline-light'>
         Wróć

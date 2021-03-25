@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
-const AlgorithmBody = () => {
-  return <div></div>;
+interface AlgorithmBodyProps {
+  children: ReactNode;
+}
+
+const AlgorithmBody = ({ children }: AlgorithmBodyProps) => {
+  return <div>{children}</div>;
 };
 
 export default AlgorithmBody;

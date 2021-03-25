@@ -14,9 +14,10 @@ module.exports = {
   },
   plugins: ['react', '@typescript-eslint', 'eslint-plugin-html'],
   rules: {
-    indent: ['error', 2],
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
     '@typescript-eslint/explicit-module-boundary-types': 'off',
+    indent: 'off',
+    '@typescript-eslint/indent': ['error', 2],
   },
 };
