@@ -16,6 +16,31 @@ body {
   background-color: lightcyan !important;
 }
 
+.pathfinding-node {
+  background-color: white;
+  border: 1px solid black;
+}
+
+.pathfinding-node-start {
+  background-color: #3cc44e;
+}
+
+.pathfinding-node-end {
+  background-color: #ff3460;
+}
+
+.pathfinding-node-wall {
+  background-color: #292929;
+}
+
+.pathfinding-node-visited {
+  background-color: #b0e9ad;
+}
+
+.pathfinding-node-path {
+  background-color: #ffd000;
+}
+
 .algorithm-select-box {
   &:hover {
     text-decoration: none;

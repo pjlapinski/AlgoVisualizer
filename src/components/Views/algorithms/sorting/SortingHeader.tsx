@@ -9,7 +9,14 @@ const SortingHeader = () => {
   const selected = useStoreState(state => state.selectedSortingAlgorithm);
 
   return (
-    <AlgorithmHeader title='Algorytmy sortujące' onVisualize={onVisualize} onReset={onReset}>
+    <AlgorithmHeader
+      title='Algorytmy sortujące'
+      onVisualize={onVisualize}
+      onReset={onReset}
+      onInsertData={() => {
+        return;
+      }}
+    >
       <select className='custom-select' value={selected} onChange={e => selectAlgo(e.target.value)}>
         <option value='bubble'>Sortowanie bąbelkowe</option>
         <option value='insertion'>Sortowanie przez wstawianie</option>
