@@ -6,7 +6,7 @@ const getMapValueWithDefault = <K, V>(map: Map<K, V>, key: K, defaultValue: V) =
   return v == undefined ? defaultValue : v;
 };
 
-const dfs = (board: IPathfindingNode[][], start: IPathfindingNode) => {
+const dfs = (board: IPathfindingNode[][], start: IPathfindingNode, delay: number) => {
   const S: IPathfindingNode[] = [];
   S.push(start);
   const prev = new Map<IPathfindingNode, IPathfindingNode>();
@@ -29,7 +29,7 @@ const dfs = (board: IPathfindingNode[][], start: IPathfindingNode) => {
   alert('Ścieżka nie istnieje!');
 };
 
-const bfs = (board: IPathfindingNode[][], start: IPathfindingNode) => {
+const bfs = (board: IPathfindingNode[][], start: IPathfindingNode, delay: number) => {
   const Q: IPathfindingNode[] = [];
   const prev = new Map<IPathfindingNode, IPathfindingNode>();
   Q.push(start);
@@ -55,7 +55,7 @@ const bfs = (board: IPathfindingNode[][], start: IPathfindingNode) => {
   alert('Ścieżka nie istnieje!');
 };
 
-const dijkstra = (board: IPathfindingNode[][], start: IPathfindingNode, end: IPathfindingNode) => {
+const dijkstra = (board: IPathfindingNode[][], start: IPathfindingNode, end: IPathfindingNode, delay: number) => {
   const Q: IPathfindingNode[] = [];
   const dist = new Map<IPathfindingNode, number>();
   const prev = new Map<IPathfindingNode, IPathfindingNode | undefined>();
@@ -110,7 +110,7 @@ const dijkstra = (board: IPathfindingNode[][], start: IPathfindingNode, end: IPa
   }
 };
 
-const aStar = (board: IPathfindingNode[][], start: IPathfindingNode, end: IPathfindingNode) => {
+const aStar = (board: IPathfindingNode[][], start: IPathfindingNode, end: IPathfindingNode, delay: number) => {
   const h = (a: IPathfindingNode, b: IPathfindingNode) => Math.abs(b.x - a.x) + Math.abs(b.y - a.y);
   const openSet = new Set<IPathfindingNode>();
   openSet.add(board[start.y][start.x]);

@@ -11,8 +11,8 @@ const SortingHeader = () => {
   return (
     <AlgorithmHeader
       title='Algorytmy sortujące'
-      onVisualize={onVisualize}
-      onReset={onReset}
+      onVisualize={() => onVisualize()}
+      onReset={() => onReset()}
       onInsertData={() => {
         return;
       }}

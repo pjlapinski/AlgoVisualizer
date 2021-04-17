@@ -1,74 +1,202 @@
-const bubbleSort = (arr: number[]) => {
+const bubbleSort = async (
+  classes: string[],
+  arr: number[],
+  delay: number,
+  setValues: (values: number[]) => void,
+  setClasses: (classes: string[]) => void
+) => {
   const n = arr.length;
+  const arrCopy = [...arr];
+  const classesCopy = [...classes];
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < n - i; j++) {
-      if (arr[j - 1] > arr[j]) {
-        [arr[j - 1], arr[j]] = [arr[j], arr[j - 1]];
+      classesCopy[j] = 'current';
+      classesCopy[j - 1] = 'current';
+      setClasses(classesCopy);
+      await new Promise(r => setTimeout(r, delay));
+      if (arrCopy[j - 1] > arrCopy[j]) {
+        [arrCopy[j - 1], arrCopy[j]] = [arrCopy[j], arrCopy[j - 1]];
+        setValues(arrCopy);
       }
+      classesCopy[j - 1] = '';
+      classesCopy[j] = j === n - i - 1 ? 'sorted' : '';
+      setClasses(classesCopy);
     }
   }
 };
 
-const insertionSort = (arr: number[]) => {
+const insertionSort = async (
+  classes: string[],
+  arr: number[],
+  delay: number,
+  setValues: (values: number[]) => void,
+  setClasses: (classes: string[]) => void
+) => {
   const n = arr.length;
+  const arrCopy = [...arr];
+  const classesCopy = [...classes];
   for (let i = 0; i < n; i++) {
-    const k = arr[i];
+    const k = arrCopy[i];
+    classesCopy[i] = 'current';
+    setClasses(classesCopy);
+    await new Promise(r => setTimeout(r, delay));
     let j = i - 1;
-    while (j >= 0 && k < arr[j]) {
-      arr[j + 1] = arr[j];
+    while (j >= 0 && k < arrCopy[j]) {
+      arrCopy[j + 1] = arrCopy[j];
+      classesCopy[j + 1] = 'current';
+      setClasses(classesCopy);
+      setValues(arrCopy);
+      await new Promise(r => setTimeout(r, delay));
+      if (j !== i - 1) {
+        classesCopy[j + 1] = '';
+        setClasses(classesCopy);
+      }
       j--;
     }
-    arr[j + 1] = k;
+    for (let l = 0; l <= i; l++) classesCopy[l] = '';
+    setClasses(classesCopy);
+    arrCopy[j + 1] = k;
+    setValues(arrCopy);
+  }
+  for (let i = 0; i < n; i++) {
+    classesCopy[i] = 'sorted';
+    setClasses(classesCopy);
+    await new Promise(r => setTimeout(r, delay));
   }
 };
 
-const partition = (arr: number[], l: number, h: number) => {
+const partition = async (
+  classes: string[],
+  arr: number[],
+  l: number,
+  h: number,
+  delay: number,
+  setValues: (values: number[]) => void,
+  setClasses: (classes: string[]) => void
+) => {
   const pi = arr[h];
+  classes[h] = 'pivot';
+  setClasses(classes);
   let i = l - 1;
   for (let j = l; j < h; j++) {
     if (arr[j] < pi) {
       i++;
+      if (classes[i] !== 'pivot') classes[i] = 'current';
+      if (classes[j] !== 'pivot') classes[j] = 'current';
+      setClasses(classes);
+      await new Promise(r => setTimeout(r, delay));
       [arr[i], arr[j]] = [arr[j], arr[i]];
+      setValues(arr);
+      if (classes[i] !== 'pivot') classes[i] = '';
+      if (classes[j] !== 'pivot') classes[j] = '';
+      setClasses(classes);
     }
   }
+  classes[i + 1] = 'current';
+  classes[h] = 'current';
+  setClasses(classes);
+  await new Promise(r => setTimeout(r, delay));
   [arr[i + 1], arr[h]] = [arr[h], arr[i + 1]];
+  setValues(arr);
+  classes[i + 1] = '';
+  classes[h] = '';
+  setClasses(classes);
   return i + 1;
 };
 
-const qs = (arr: number[], l: number, h: number) => {
+const qs = async (
+  classes: string[],
+  arr: number[],
+  l: number,
+  h: number,
+  delay: number,
+  setValues: (values: number[]) => void,
+  setClasses: (classes: string[]) => void
+) => {
   if (l < h) {
-    const pi = partition(arr, l, h);
-    qs(arr, l, pi - 1);
-    qs(arr, pi + 1, h);
+    const pi = await partition(classes, arr, l, h, delay, setValues, setClasses);
+    await new Promise(r => setTimeout(r, delay));
+    await qs(classes, arr, l, pi - 1, delay, setValues, setClasses);
+    await qs(classes, arr, pi + 1, h, delay, setValues, setClasses);
   }
 };
 
-const quickSort = (arr: number[]) => {
-  qs(arr, 0, arr.length - 1);
+const quickSort = async (
+  classes: string[],
+  arr: number[],
+  delay: number,
+  setValues: (values: number[]) => void,
+  setClasses: (classes: string[]) => void
+) => {
+  await qs([...classes], [...arr], 0, arr.length - 1, delay, setValues, setClasses);
 };
 
-const heapify = (arr: number[], n: number, i: number) => {
+const heapify = async (
+  classes: string[],
+  arr: number[],
+  n: number,
+  i: number,
+  delay: number,
+  setValues: (values: number[]) => void,
+  setClasses: (classes: string[]) => void
+) => {
   let lg = i;
   const l = 2 * i + 1;
   const r = 2 * i + 2;
   if (l < n && arr[lg] < arr[l]) lg = l;
   if (r < n && arr[lg] < arr[r]) lg = r;
   if (lg != i) {
+    classes[i] = 'current';
+    classes[lg] = 'current';
+    setClasses(classes);
+    await new Promise(r => setTimeout(r, delay));
     [arr[i], arr[lg]] = [arr[lg], arr[i]];
-    heapify(arr, n, lg);
+    setValues(arr);
+    classes[i] = '';
+    classes[lg] = '';
+    setClasses(classes);
+    await heapify(classes, arr, n, lg, delay, setValues, setClasses);
   }
 };
 
-const heapSort = (arr: number[]) => {
+const heapSort = async (
+  classes: string[],
+  arr: number[],
+  delay: number,
+  setValues: (values: number[]) => void,
+  setClasses: (classes: string[]) => void
+) => {
+  const arrCopy = [...arr];
+  const classesCopy = [...classes];
   const n = arr.length;
-  for (let i = Math.floor(n / 2) - 1; i >= 0; i--) heapify(arr, n, i);
+  for (let i = Math.floor(n / 2) - 1; i >= 0; i--)
+    await heapify(classesCopy, arrCopy, n, i, delay, setValues, setClasses);
   for (let i = n - 1; i > 0; i--) {
-    [arr[0], arr[i]] = [arr[i], arr[0]];
-    heapify(arr, i, 0);
+    classesCopy[0] = 'current';
+    classesCopy[i] = 'current';
+    setClasses(classesCopy);
+    await new Promise(r => setTimeout(r, delay));
+    [arrCopy[0], arrCopy[i]] = [arrCopy[i], arrCopy[0]];
+    setValues(arrCopy);
+    classesCopy[0] = '';
+    classesCopy[i] = 'sorted';
+    setClasses(classesCopy);
+    await heapify(classesCopy, arrCopy, i, 0, delay, setValues, setClasses);
   }
+  classesCopy[0] = 'sorted';
+  setClasses(classesCopy);
 };
 
-const merge = (arr: number[], l: number, m: number, r: number) => {
+const merge = async (
+  classes: string[],
+  arr: number[],
+  l: number,
+  m: number,
+  r: number,
+  delay: number,
+  setValues: (values: number[]) => void,
+  setClasses: (classes: string[]) => void
+) => {
   const lenL = m - l + 1;
   const lenR = r - m;
   const left = [];
@@ -82,37 +210,92 @@ const merge = (arr: number[], l: number, m: number, r: number) => {
   let k = l;
   while (i < lenL && j < lenR) {
     if (left[i] < right[j]) {
+      classes[l + i] = 'current';
+      classes[k] = 'current';
+      setClasses(classes);
+      await new Promise(r => setTimeout(r, delay));
+
       arr[k] = left[i];
+      setValues(arr);
+
+      classes[l + i] = '';
+      classes[k] = '';
+      setClasses(classes);
       i++;
     } else {
+      classes[m + j] = 'current';
+      classes[k] = 'current';
+      setClasses(classes);
+      await new Promise(r => setTimeout(r, delay));
+
       arr[k] = right[j];
+      setValues(arr);
+
+      classes[m + j] = '';
+      classes[k] = '';
+      setClasses(classes);
       j++;
     }
     k++;
   }
   while (i < lenL) {
     arr[k] = left[i];
+    setValues(arr);
+    classes[k] = '';
+    setClasses(classes);
+    await new Promise(r => setTimeout(r, delay));
     i++;
     k++;
   }
   while (j < lenR) {
     arr[k] = right[j];
+    setValues(arr);
+    classes[k] = '';
+    setClasses(classes);
+    await new Promise(r => setTimeout(r, delay));
     j++;
     k++;
   }
 };
 
-const ms = (arr: number[], l: number, r: number) => {
+const ms = async (
+  classes: string[],
+  arr: number[],
+  l: number,
+  r: number,
+  delay: number,
+  setValues: (values: number[]) => void,
+  setClasses: (classes: string[]) => void
+) => {
   if (l < r) {
     const m = Math.floor((l + r) / 2);
-    ms(arr, l, m);
-    ms(arr, m + 1, r);
-    merge(arr, l, m, r);
+    classes[l] = 'pivot';
+    classes[r] = 'pivot';
+    setClasses(classes);
+    await new Promise(r => setTimeout(r, delay));
+    await ms(classes, arr, l, m, delay, setValues, setClasses);
+    await new Promise(r => setTimeout(r, delay));
+    await ms(classes, arr, m + 1, r, delay, setValues, setClasses);
+    await new Promise(r => setTimeout(r, delay));
+    await merge(classes, arr, l, m, r, delay, setValues, setClasses);
   }
 };
 
-const mergeSort = (arr: number[]) => {
-  ms(arr, 0, arr.length - 1);
+const mergeSort = async (
+  classes: string[],
+  arr: number[],
+  delay: number,
+  setValues: (values: number[]) => void,
+  setClasses: (classes: string[]) => void
+) => {
+  const classesCopy = [...classes];
+  const arrCopy = [...arr];
+  await ms(classesCopy, arrCopy, 0, arr.length - 1, delay, setValues, setClasses);
+  for (let i = 0; i < classesCopy.length; i++) {
+    classesCopy[i] = 'sorted';
+    setClasses(classesCopy);
+    await new Promise(r => setTimeout(r, delay));
+  }
 };
 
 export { bubbleSort, insertionSort, quickSort, heapSort, mergeSort };

@@ -1,4 +1,4 @@
-import { Action, action, createStore, createTypedHooks, persist } from 'easy-peasy';
+import { Action, action, createStore, createTypedHooks, persist, thunk, Thunk } from 'easy-peasy';
 import { bubbleSort, insertionSort, quickSort, heapSort, mergeSort } from '../algorithms/sorting';
 import { dfs, bfs, dijkstra, aStar } from '../algorithms/pathfinding';
 
@@ -18,7 +18,9 @@ export interface PathfindingNodeStateSet extends PathfindingNodeCoordinates {
 }
 
 interface StoreModel {
+  simulationDelay: number;
   sortingValues: number[];
+  sortingValuesClasses: string[];
   selectedSortingAlgorithm: string;
   pathfindingBoard: IPathfindingNode[][];
   pathfindingBoardHeight: number;
@@ -28,7 +30,7 @@ interface StoreModel {
   pathfindingEnd: IPathfindingNode | undefined;
   setSelectedSortingAlgorithm: Action<StoreModel, string>;
   resetSortingValues: Action<StoreModel>;
-  sort: Action<StoreModel>;
+  resetSortingValuesClasses: Action<StoreModel>;
   createEmptyPathfindingBoard: Action<StoreModel>;
   generatePathfindingGraph: Action<StoreModel>;
   clearPathfindingVisuals: Action<StoreModel>;
@@ -36,6 +38,9 @@ interface StoreModel {
   setPathfindingEnd: Action<StoreModel, PathfindingNodeCoordinates>;
   setSelectedPathfindingAlgorithm: Action<StoreModel, string>;
   findPath: Action<StoreModel>;
+  setSortingValues: Action<StoreModel, number[]>;
+  setSortingValuesClasses: Action<StoreModel, string[]>;
+  sort: Thunk<StoreModel>;
 }
 
 const typedHooks = createTypedHooks<StoreModel>();
@@ -47,10 +52,12 @@ export const useStoreState = typedHooks.useStoreState;
 export default createStore<StoreModel>(
   persist(
     {
-      sortingValues: [],
+      simulationDelay: 20.0,
+      sortingValues: [2, 3, 10, 4, 5, 3, 9, 5, 5, 3, 7],
+      sortingValuesClasses: ['', '', '', '', '', '', '', '', '', '', ''],
       selectedSortingAlgorithm: 'bubble',
       pathfindingBoard: [[]],
-      pathfindingBoardHeight: 15,
+      pathfindingBoardHeight: 10,
       pathfindingBoardWidth: 50,
       selectedPathfindingAlgorithm: 'dfs',
       pathfindingStart: undefined,
@@ -59,26 +66,14 @@ export default createStore<StoreModel>(
         state.selectedSortingAlgorithm = algo;
       }),
       resetSortingValues: action(state => {
-        state.sortingValues = [9, 2, 5, 3, 1];
+        state.sortingValues = [2, 3, 10, 4, 5, 3, 9, 5, 5, 3, 7];
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        state.sortingValuesClasses = state.sortingValues.map(_ => '');
+        location.reload();
       }),
-      sort: action(state => {
-        switch (state.selectedSortingAlgorithm) {
-          case 'bubble':
-            bubbleSort(state.sortingValues);
-            break;
-          case 'insertion':
-            insertionSort(state.sortingValues);
-            break;
-          case 'quick':
-            quickSort(state.sortingValues);
-            break;
-          case 'heap':
-            heapSort(state.sortingValues);
-            break;
-          case 'merge':
-            mergeSort(state.sortingValues);
-            break;
-        }
+      resetSortingValuesClasses: action(state => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        state.sortingValuesClasses = state.sortingValues.map(_ => '');
       }),
       createEmptyPathfindingBoard: action(state => {
         state.pathfindingStart = undefined;
@@ -141,16 +136,73 @@ export default createStore<StoreModel>(
         }
         switch (state.selectedPathfindingAlgorithm) {
           case 'bfs':
-            bfs(state.pathfindingBoard, state.pathfindingStart);
+            bfs(state.pathfindingBoard, state.pathfindingStart, state.simulationDelay);
             break;
           case 'dfs':
-            dfs(state.pathfindingBoard, state.pathfindingStart);
+            dfs(state.pathfindingBoard, state.pathfindingStart, state.simulationDelay);
             break;
           case 'dijkstra':
-            dijkstra(state.pathfindingBoard, state.pathfindingStart, state.pathfindingEnd);
+            dijkstra(state.pathfindingBoard, state.pathfindingStart, state.pathfindingEnd, state.simulationDelay);
             break;
           case 'a-star':
-            aStar(state.pathfindingBoard, state.pathfindingStart, state.pathfindingEnd);
+            aStar(state.pathfindingBoard, state.pathfindingStart, state.pathfindingEnd, state.simulationDelay);
+            break;
+        }
+      }),
+      setSortingValues: action((state, payload) => {
+        state.sortingValues = payload;
+      }),
+      setSortingValuesClasses: action((state, payload) => {
+        state.sortingValuesClasses = payload;
+      }),
+      sort: thunk(async (actions, payload, helper) => {
+        actions.resetSortingValuesClasses();
+        const state = helper.getState();
+        switch (state.selectedSortingAlgorithm) {
+          case 'bubble':
+            await bubbleSort(
+              state.sortingValuesClasses,
+              state.sortingValues,
+              state.simulationDelay,
+              actions.setSortingValues,
+              actions.setSortingValuesClasses
+            );
+            break;
+          case 'insertion':
+            insertionSort(
+              state.sortingValuesClasses,
+              state.sortingValues,
+              state.simulationDelay,
+              actions.setSortingValues,
+              actions.setSortingValuesClasses
+            );
+            break;
+          case 'quick':
+            quickSort(
+              state.sortingValuesClasses,
+              state.sortingValues,
+              state.simulationDelay,
+              actions.setSortingValues,
+              actions.setSortingValuesClasses
+            );
+            break;
+          case 'heap':
+            heapSort(
+              state.sortingValuesClasses,
+              state.sortingValues,
+              state.simulationDelay,
+              actions.setSortingValues,
+              actions.setSortingValuesClasses
+            );
+            break;
+          case 'merge':
+            mergeSort(
+              state.sortingValuesClasses,
+              state.sortingValues,
+              state.simulationDelay,
+              actions.setSortingValues,
+              actions.setSortingValuesClasses
+            );
             break;
         }
       }),
