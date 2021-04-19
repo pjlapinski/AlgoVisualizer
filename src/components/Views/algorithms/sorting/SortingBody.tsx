@@ -7,11 +7,11 @@ import pseudocodes from '../../../../algorithms/pseudocodes/sorting';
 const SortingBody = () => {
   const sortingValues = useStoreState(
     state => state.sortingValues,
-    (prev, next) => false
+    () => false
   );
   const sortingValuesClasses = useStoreState(
     state => state.sortingValuesClasses,
-    (prev, next) => false
+    () => false
   );
   const chosenAlgo = useStoreState(state => state.selectedSortingAlgorithm);
 
