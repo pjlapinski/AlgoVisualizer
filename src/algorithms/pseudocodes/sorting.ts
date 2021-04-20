@@ -16,13 +16,10 @@ const bubbleSort: Pseudocode = {
 const insertionSort: Pseudocode = {
   initialValues: ['arr := tablica elementów do posortowania', 'n := liczba elementów w arr'],
   lines: [
-    'dla i := 1 do n - 1:',
-    '\tk := arr[i]',
-    '\tj := i - 1',
-    '\tdopóki j >= 0 oraz k < arr[j]:',
-    '\t\tarr[j + 1] = arr[j]',
-    '\t\tj = j - 1',
-    '\tarr[j + 1] = k',
+    'dla każdego elementu n tablicy:',
+    '\tdla wszystkich elementów poprzedzających n:',
+    '\t\tjeżeli n powinien znajdować się przed aktualnym elementem:',
+    '\t\t\twstaw n na odpowiednie miejsce w tablicy',
   ],
 };
 

@@ -1,4 +1,4 @@
-import { Action, action, createStore, createTypedHooks, persist, thunk, Thunk } from 'easy-peasy';
+import { Action, action, createStore, createTypedHooks, persist, thunk, Thunk, computed, Computed } from 'easy-peasy';
 import { bubbleSort, insertionSort, quickSort, heapSort, mergeSort } from '../algorithms/sorting';
 import { dfs, bfs, dijkstra, aStar } from '../algorithms/pathfinding';
 
@@ -17,6 +17,11 @@ export interface PathfindingNodeStateSet extends PathfindingNodeCoordinates {
   state: string;
 }
 
+export interface LineHighlight {
+  procedure: number;
+  line: number;
+}
+
 interface StoreModel {
   simulationDelay: number;
   sortingValues: number[];
@@ -28,6 +33,11 @@ interface StoreModel {
   selectedPathfindingAlgorithm: string;
   pathfindingStart: IPathfindingNode | undefined;
   pathfindingEnd: IPathfindingNode | undefined;
+  highlightedSortingPseudocodeLine: LineHighlight;
+  highlightedPathfindingPseudocodeLine: LineHighlight;
+  maxSortingValue: Computed<StoreModel, number>;
+  setHighlightedSortingPseudocodeLine: Action<StoreModel, LineHighlight>;
+  setHighlightedPathfindingPseudocodeLine: Action<StoreModel, LineHighlight>;
   setSelectedSortingAlgorithm: Action<StoreModel, string>;
   resetSortingValues: Action<StoreModel>;
   resetSortingValuesClasses: Action<StoreModel>;
@@ -62,13 +72,26 @@ export default createStore<StoreModel>(
       selectedPathfindingAlgorithm: 'dfs',
       pathfindingStart: undefined,
       pathfindingEnd: undefined,
+      highlightedSortingPseudocodeLine: { procedure: -1, line: -1 },
+      highlightedPathfindingPseudocodeLine: { procedure: -1, line: -1 },
+      maxSortingValue: computed(state => Math.max(...state.sortingValues)),
+      setHighlightedSortingPseudocodeLine: action((state, highlight) => {
+        state.highlightedSortingPseudocodeLine = highlight;
+      }),
+      setHighlightedPathfindingPseudocodeLine: action((state, highlight) => {
+        state.highlightedPathfindingPseudocodeLine = highlight;
+      }),
       setSelectedSortingAlgorithm: action((state, algo) => {
+        state.highlightedSortingPseudocodeLine = { procedure: -1, line: -1 };
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        state.sortingValuesClasses = state.sortingValues.map(_ => '');
         state.selectedSortingAlgorithm = algo;
       }),
       resetSortingValues: action(state => {
         state.sortingValues = [2, 3, 10, 4, 5, 3, 9, 5, 5, 3, 7];
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         state.sortingValuesClasses = state.sortingValues.map(_ => '');
+        state.highlightedSortingPseudocodeLine = { procedure: -1, line: -1 };
         location.reload();
       }),
       resetSortingValuesClasses: action(state => {
@@ -165,7 +188,8 @@ export default createStore<StoreModel>(
               state.sortingValues,
               state.simulationDelay,
               actions.setSortingValues,
-              actions.setSortingValuesClasses
+              actions.setSortingValuesClasses,
+              actions.setHighlightedSortingPseudocodeLine
             );
             break;
           case 'insertion':
@@ -174,7 +198,8 @@ export default createStore<StoreModel>(
               state.sortingValues,
               state.simulationDelay,
               actions.setSortingValues,
-              actions.setSortingValuesClasses
+              actions.setSortingValuesClasses,
+              actions.setHighlightedSortingPseudocodeLine
             );
             break;
           case 'quick':
@@ -183,7 +208,8 @@ export default createStore<StoreModel>(
               state.sortingValues,
               state.simulationDelay,
               actions.setSortingValues,
-              actions.setSortingValuesClasses
+              actions.setSortingValuesClasses,
+              actions.setHighlightedSortingPseudocodeLine
             );
             break;
           case 'heap':
@@ -192,7 +218,8 @@ export default createStore<StoreModel>(
               state.sortingValues,
               state.simulationDelay,
               actions.setSortingValues,
-              actions.setSortingValuesClasses
+              actions.setSortingValuesClasses,
+              actions.setHighlightedSortingPseudocodeLine
             );
             break;
           case 'merge':
@@ -201,7 +228,8 @@ export default createStore<StoreModel>(
               state.sortingValues,
               state.simulationDelay,
               actions.setSortingValues,
-              actions.setSortingValuesClasses
+              actions.setSortingValuesClasses,
+              actions.setHighlightedSortingPseudocodeLine
             );
             break;
         }

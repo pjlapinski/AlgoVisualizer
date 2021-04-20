@@ -20,8 +20,17 @@ body {
   width: 100vw;
 }
 
+.vw-50 {
+  width: 50vw;
+}
+
 .bg-lightcyan {
   background-color: lightcyan !important;
+}
+
+.pseudocode-highlight {
+  background-color: #ffd000;
+  width: fit-content;
 }
 
 .sorting-node {

@@ -1,9 +1,12 @@
+import { LineHighlight } from '../store';
+
 const bubbleSort = async (
   classes: string[],
   arr: number[],
   delay: number,
   setValues: (values: number[]) => void,
-  setClasses: (classes: string[]) => void
+  setClasses: (classes: string[]) => void,
+  highlightLine: (highlight: LineHighlight) => void
 ) => {
   const n = arr.length;
   const arrCopy = [...arr];
@@ -14,9 +17,11 @@ const bubbleSort = async (
       classesCopy[j - 1] = 'current';
       setClasses(classesCopy);
       await new Promise(r => setTimeout(r, delay));
+      highlightLine({ procedure: 0, line: 2 });
       if (arrCopy[j - 1] > arrCopy[j]) {
         [arrCopy[j - 1], arrCopy[j]] = [arrCopy[j], arrCopy[j - 1]];
         setValues(arrCopy);
+        highlightLine({ procedure: 0, line: 3 });
       }
       classesCopy[j - 1] = '';
       classesCopy[j] = j === n - i - 1 ? 'sorted' : '';
@@ -30,18 +35,23 @@ const insertionSort = async (
   arr: number[],
   delay: number,
   setValues: (values: number[]) => void,
-  setClasses: (classes: string[]) => void
+  setClasses: (classes: string[]) => void,
+  highlightLine: (highlight: LineHighlight) => void
 ) => {
   const n = arr.length;
   const arrCopy = [...arr];
   const classesCopy = [...classes];
   for (let i = 0; i < n; i++) {
+    highlightLine({ procedure: 0, line: 1 });
     const k = arrCopy[i];
     classesCopy[i] = 'current';
     setClasses(classesCopy);
     await new Promise(r => setTimeout(r, delay));
     let j = i - 1;
+    highlightLine({ procedure: 0, line: 2 });
+    await new Promise(r => setTimeout(r, delay));
     while (j >= 0 && k < arrCopy[j]) {
+      highlightLine({ procedure: 0, line: 3 });
       arrCopy[j + 1] = arrCopy[j];
       classesCopy[j + 1] = 'current';
       setClasses(classesCopy);
@@ -72,18 +82,21 @@ const partition = async (
   h: number,
   delay: number,
   setValues: (values: number[]) => void,
-  setClasses: (classes: string[]) => void
+  setClasses: (classes: string[]) => void,
+  highlightLine: (highlight: LineHighlight) => void
 ) => {
   const pi = arr[h];
   classes[h] = 'pivot';
   setClasses(classes);
   let i = l - 1;
   for (let j = l; j < h; j++) {
+    highlightLine({ procedure: 0, line: 4 });
     if (arr[j] < pi) {
       i++;
       if (classes[i] !== 'pivot') classes[i] = 'current';
       if (classes[j] !== 'pivot') classes[j] = 'current';
       setClasses(classes);
+      highlightLine({ procedure: 0, line: 6 });
       await new Promise(r => setTimeout(r, delay));
       [arr[i], arr[j]] = [arr[j], arr[i]];
       setValues(arr);
@@ -95,6 +108,7 @@ const partition = async (
   classes[i + 1] = 'current';
   classes[h] = 'current';
   setClasses(classes);
+  highlightLine({ procedure: 0, line: 7 });
   await new Promise(r => setTimeout(r, delay));
   [arr[i + 1], arr[h]] = [arr[h], arr[i + 1]];
   setValues(arr);
@@ -111,14 +125,18 @@ const qs = async (
   h: number,
   delay: number,
   setValues: (values: number[]) => void,
-  setClasses: (classes: string[]) => void
+  setClasses: (classes: string[]) => void,
+  highlightLine: (highlight: LineHighlight) => void
 ) => {
+  highlightLine({ procedure: 1, line: 1 });
   if (l < h) {
-    const pi = await partition(classes, arr, l, h, delay, setValues, setClasses);
+    const pi = await partition(classes, arr, l, h, delay, setValues, setClasses, highlightLine);
+    highlightLine({ procedure: 1, line: 2 });
     await new Promise(r => setTimeout(r, delay));
-    await qs(classes, arr, l, pi - 1, delay, setValues, setClasses);
-    await qs(classes, arr, pi + 1, h, delay, setValues, setClasses);
+    await qs(classes, arr, l, pi - 1, delay, setValues, setClasses, highlightLine);
+    await qs(classes, arr, pi + 1, h, delay, setValues, setClasses, highlightLine);
   }
+  highlightLine({ procedure: -1, line: -1 });
 };
 
 const quickSort = async (
@@ -126,9 +144,18 @@ const quickSort = async (
   arr: number[],
   delay: number,
   setValues: (values: number[]) => void,
-  setClasses: (classes: string[]) => void
+  setClasses: (classes: string[]) => void,
+  highlightLine: (highlight: LineHighlight) => void
 ) => {
-  await qs([...classes], [...arr], 0, arr.length - 1, delay, setValues, setClasses);
+  const classesCopy = [...classes];
+  const n = arr.length;
+
+  await qs(classesCopy, [...arr], 0, n - 1, delay, setValues, setClasses, highlightLine);
+  for (let i = 0; i < n; i++) {
+    classesCopy[i] = 'sorted';
+    setClasses(classesCopy);
+    await new Promise(r => setTimeout(r, delay));
+  }
 };
 
 const heapify = async (
@@ -138,7 +165,8 @@ const heapify = async (
   i: number,
   delay: number,
   setValues: (values: number[]) => void,
-  setClasses: (classes: string[]) => void
+  setClasses: (classes: string[]) => void,
+  highlightLine: (highlight: LineHighlight) => void
 ) => {
   let lg = i;
   const l = 2 * i + 1;
@@ -149,13 +177,14 @@ const heapify = async (
     classes[i] = 'current';
     classes[lg] = 'current';
     setClasses(classes);
+    highlightLine({ procedure: 0, line: 9 });
     await new Promise(r => setTimeout(r, delay));
     [arr[i], arr[lg]] = [arr[lg], arr[i]];
     setValues(arr);
     classes[i] = '';
     classes[lg] = '';
     setClasses(classes);
-    await heapify(classes, arr, n, lg, delay, setValues, setClasses);
+    await heapify(classes, arr, n, lg, delay, setValues, setClasses, highlightLine);
   }
 };
 
@@ -164,27 +193,30 @@ const heapSort = async (
   arr: number[],
   delay: number,
   setValues: (values: number[]) => void,
-  setClasses: (classes: string[]) => void
+  setClasses: (classes: string[]) => void,
+  highlightLine: (highlight: LineHighlight) => void
 ) => {
   const arrCopy = [...arr];
   const classesCopy = [...classes];
   const n = arr.length;
   for (let i = Math.floor(n / 2) - 1; i >= 0; i--)
-    await heapify(classesCopy, arrCopy, n, i, delay, setValues, setClasses);
+    await heapify(classesCopy, arrCopy, n, i, delay, setValues, setClasses, highlightLine);
   for (let i = n - 1; i > 0; i--) {
     classesCopy[0] = 'current';
     classesCopy[i] = 'current';
     setClasses(classesCopy);
+    highlightLine({ procedure: 1, line: 3 });
     await new Promise(r => setTimeout(r, delay));
     [arrCopy[0], arrCopy[i]] = [arrCopy[i], arrCopy[0]];
     setValues(arrCopy);
     classesCopy[0] = '';
     classesCopy[i] = 'sorted';
     setClasses(classesCopy);
-    await heapify(classesCopy, arrCopy, i, 0, delay, setValues, setClasses);
+    await heapify(classesCopy, arrCopy, i, 0, delay, setValues, setClasses, highlightLine);
   }
   classesCopy[0] = 'sorted';
   setClasses(classesCopy);
+  highlightLine({ procedure: -1, line: -1 });
 };
 
 const merge = async (
@@ -195,12 +227,15 @@ const merge = async (
   r: number,
   delay: number,
   setValues: (values: number[]) => void,
-  setClasses: (classes: string[]) => void
+  setClasses: (classes: string[]) => void,
+  highlightLine: (highlight: LineHighlight) => void
 ) => {
   const lenL = m - l + 1;
   const lenR = r - m;
   const left = [];
   const right = [];
+  highlightLine({ procedure: 0, line: 3 });
+  await new Promise(r => setTimeout(r, delay));
   for (let i = l; i <= r; i++) {
     if (i < l + lenL) left.push(arr[i]);
     else right.push(arr[i]);
@@ -209,10 +244,12 @@ const merge = async (
   let j = 0;
   let k = l;
   while (i < lenL && j < lenR) {
+    highlightLine({ procedure: 0, line: 7 });
     if (left[i] < right[j]) {
       classes[l + i] = 'current';
       classes[k] = 'current';
       setClasses(classes);
+      highlightLine({ procedure: 0, line: 9 });
       await new Promise(r => setTimeout(r, delay));
 
       arr[k] = left[i];
@@ -226,6 +263,7 @@ const merge = async (
       classes[m + j] = 'current';
       classes[k] = 'current';
       setClasses(classes);
+      highlightLine({ procedure: 0, line: 12 });
       await new Promise(r => setTimeout(r, delay));
 
       arr[k] = right[j];
@@ -243,6 +281,7 @@ const merge = async (
     setValues(arr);
     classes[k] = '';
     setClasses(classes);
+    highlightLine({ procedure: 0, line: 20 });
     await new Promise(r => setTimeout(r, delay));
     i++;
     k++;
@@ -265,20 +304,25 @@ const ms = async (
   r: number,
   delay: number,
   setValues: (values: number[]) => void,
-  setClasses: (classes: string[]) => void
+  setClasses: (classes: string[]) => void,
+  highlightLine: (highlight: LineHighlight) => void
 ) => {
   if (l < r) {
     const m = Math.floor((l + r) / 2);
     classes[l] = 'pivot';
     classes[r] = 'pivot';
     setClasses(classes);
+    highlightLine({ procedure: 1, line: 3 });
     await new Promise(r => setTimeout(r, delay));
-    await ms(classes, arr, l, m, delay, setValues, setClasses);
+    await ms(classes, arr, l, m, delay, setValues, setClasses, highlightLine);
+    highlightLine({ procedure: 1, line: 4 });
     await new Promise(r => setTimeout(r, delay));
-    await ms(classes, arr, m + 1, r, delay, setValues, setClasses);
+    await ms(classes, arr, m + 1, r, delay, setValues, setClasses, highlightLine);
+    highlightLine({ procedure: 1, line: 5 });
     await new Promise(r => setTimeout(r, delay));
-    await merge(classes, arr, l, m, r, delay, setValues, setClasses);
+    await merge(classes, arr, l, m, r, delay, setValues, setClasses, highlightLine);
   }
+  highlightLine({ procedure: -1, line: -1 });
 };
 
 const mergeSort = async (
@@ -286,11 +330,12 @@ const mergeSort = async (
   arr: number[],
   delay: number,
   setValues: (values: number[]) => void,
-  setClasses: (classes: string[]) => void
+  setClasses: (classes: string[]) => void,
+  highlightLine: (highlight: LineHighlight) => void
 ) => {
   const classesCopy = [...classes];
   const arrCopy = [...arr];
-  await ms(classesCopy, arrCopy, 0, arr.length - 1, delay, setValues, setClasses);
+  await ms(classesCopy, arrCopy, 0, arr.length - 1, delay, setValues, setClasses, highlightLine);
   for (let i = 0; i < classesCopy.length; i++) {
     classesCopy[i] = 'sorted';
     setClasses(classesCopy);
