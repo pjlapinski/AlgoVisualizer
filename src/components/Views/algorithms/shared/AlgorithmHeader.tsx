@@ -11,7 +11,7 @@ interface AlgorithmHeaderProps {
 
 const AlgorithmHeader = ({ title, children, onVisualize, onReset, onInsertData }: AlgorithmHeaderProps) => {
   return (
-    <header className='navbar text-white navbar-expand navbar-primary bg-primary form-inline'>
+    <header className='navbar sticky-top text-white navbar-expand navbar-primary bg-primary form-inline'>
       <span className='navbar-brand'>{title}</span>
       <div className='border border-right-0 border-top-0 border-bottom-0 mr-auto'>
         <div className='btn' onClick={onInsertData}>
