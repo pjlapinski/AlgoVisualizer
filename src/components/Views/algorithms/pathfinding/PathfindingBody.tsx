@@ -5,9 +5,20 @@ import PathfindingNode from './PathfindingNode';
 import pseudocodes from '../../../../algorithms/pseudocodes/pathfinding';
 
 const PathfindingBody = () => {
-  const board = useStoreState(store => store.pathfindingBoard);
+  const board = useStoreState(
+    store => store.pathfindingBoard,
+    () => false
+  );
   const chosenAlgo = useStoreState(store => store.selectedPathfindingAlgorithm);
+  const currentInput = useStoreState(store => store.currentPathfindingInput);
+  const lineHighlight = useStoreState(state => state.highlightedPathfindingPseudocodeLine);
+
+  const generateGraph = useStoreActions(store => store.generatePathfindingGraph);
   const initBoard = useStoreActions(store => store.createEmptyPathfindingBoard);
+  const incrementNodeCost = useStoreActions(store => store.incrementPathfindingNodeCost);
+  const setNodeAsStart = useStoreActions(store => store.setPathfindingStart);
+  const setNodeAsEnd = useStoreActions(store => store.setPathfindingEnd);
+  const setNodeAsWall = useStoreActions(store => store.setPathfindingNodeAsWall);
 
   useEffect(() => {
     initBoard();
@@ -18,7 +29,27 @@ const PathfindingBody = () => {
       {board.map((row, index) => (
         <div key={index} className='row p-0 m-0 flex-nowrap'>
           {row.map(node => (
-            <PathfindingNode key={`${node.x}-${node.y}`} node={node} />
+            <PathfindingNode
+              key={`${node.x}-${node.y}`}
+              node={node}
+              onClick={() => {
+                generateGraph();
+                switch (currentInput) {
+                  case 'start':
+                    setNodeAsStart(node);
+                    break;
+                  case 'end':
+                    setNodeAsEnd(node);
+                    break;
+                  case 'wall':
+                    setNodeAsWall(node);
+                    break;
+                  case 'cost':
+                    incrementNodeCost(node);
+                    break;
+                }
+              }}
+            />
           ))}
         </div>
       ))}
@@ -32,7 +63,7 @@ const PathfindingBody = () => {
         </ul>
         <ol className='pl-4'>
           {pseudocodes[chosenAlgo].lines.map((line, idx) => (
-            <li className='whitespace' key={idx}>
+            <li className={`whitespace ${lineHighlight.line === idx ? 'pseudocode-highlight' : ''}`} key={idx}>
               {line}
             </li>
           ))}

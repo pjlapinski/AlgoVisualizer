@@ -49,6 +49,7 @@ const dijkstra: Pseudocode = {
     '\tu := wierzchołek z najmniejszym dystansem do r, usunięty z Q',
     '\tjeżeli u jest poszukiwanym elementem:',
     '\t\tzwróć ścieżkę przebytą z r do u',
+    '\toznacz u jako element przeszukany',
     '\tdla każdego sąsiada v wierzchołka u:',
     '\t\talt := dystans z r do u + koszt przejścia z u do v',
     '\t\tjeżeli alt jest mniejszy, niż dystans z r do v:',
@@ -60,8 +61,6 @@ const dijkstra: Pseudocode = {
 const aStar: Pseudocode = {
   initialValues: ['g := przeszukiwany graf', 'r := wierzchołek od którego zaczynamy przeszukiwanie'],
   lines: [
-    'closedSet := pusty zbiór',
-    'openSet := zbiór zawierający r',
     'ustaw długość najkrótszej znanej trasy z r do r jako 0',
     'dopóki openSet nie jest pusty:',
     '\tx := wierzchołek z najkrótszą przewidywaną trasą',

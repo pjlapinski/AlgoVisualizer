@@ -7,6 +7,8 @@ interface PathfindingNodeCoordinates {
   y: number;
 }
 
+type PathfindingNodeStates = 'start' | 'end' | 'wall' | 'cost' | 'visited' | 'unvisited' | 'path';
+
 export interface IPathfindingNode extends PathfindingNodeCoordinates {
   neighbors: PathfindingNodeCoordinates[];
   state: string;
@@ -22,8 +24,15 @@ export interface LineHighlight {
   line: number;
 }
 
+export interface setNodeStateInfo {
+  x: number;
+  y: number;
+  state: PathfindingNodeStates;
+}
+
 interface StoreModel {
   simulationDelay: number;
+  initialSortingValues: number[];
   sortingValues: number[];
   sortingValuesClasses: string[];
   selectedSortingAlgorithm: string;
@@ -31,11 +40,13 @@ interface StoreModel {
   pathfindingBoardHeight: number;
   pathfindingBoardWidth: number;
   selectedPathfindingAlgorithm: string;
+  currentPathfindingInput: PathfindingNodeStates;
   pathfindingStart: IPathfindingNode | undefined;
   pathfindingEnd: IPathfindingNode | undefined;
   highlightedSortingPseudocodeLine: LineHighlight;
   highlightedPathfindingPseudocodeLine: LineHighlight;
   maxSortingValue: Computed<StoreModel, number>;
+  setInitialSortingValues: Action<StoreModel, number[]>;
   setHighlightedSortingPseudocodeLine: Action<StoreModel, LineHighlight>;
   setHighlightedPathfindingPseudocodeLine: Action<StoreModel, LineHighlight>;
   setSelectedSortingAlgorithm: Action<StoreModel, string>;
@@ -44,12 +55,16 @@ interface StoreModel {
   createEmptyPathfindingBoard: Action<StoreModel>;
   generatePathfindingGraph: Action<StoreModel>;
   clearPathfindingVisuals: Action<StoreModel>;
+  setCurrentPathfindingInput: Action<StoreModel, PathfindingNodeStates>;
   setPathfindingStart: Action<StoreModel, PathfindingNodeCoordinates>;
   setPathfindingEnd: Action<StoreModel, PathfindingNodeCoordinates>;
+  setPathfindingNodeAsWall: Action<StoreModel, PathfindingNodeCoordinates>;
+  setPathfindingNodeState: Action<StoreModel, setNodeStateInfo>;
+  incrementPathfindingNodeCost: Action<StoreModel, PathfindingNodeCoordinates>;
   setSelectedPathfindingAlgorithm: Action<StoreModel, string>;
-  findPath: Action<StoreModel>;
   setSortingValues: Action<StoreModel, number[]>;
   setSortingValuesClasses: Action<StoreModel, string[]>;
+  findPath: Thunk<StoreModel>;
   sort: Thunk<StoreModel>;
 }
 
@@ -62,7 +77,8 @@ export const useStoreState = typedHooks.useStoreState;
 export default createStore<StoreModel>(
   persist(
     {
-      simulationDelay: 20.0,
+      simulationDelay: 200.0,
+      initialSortingValues: [2, 3, 10, 4, 5, 3, 9, 5, 5, 3, 7],
       sortingValues: [2, 3, 10, 4, 5, 3, 9, 5, 5, 3, 7],
       sortingValuesClasses: ['', '', '', '', '', '', '', '', '', '', ''],
       selectedSortingAlgorithm: 'bubble',
@@ -70,11 +86,15 @@ export default createStore<StoreModel>(
       pathfindingBoardHeight: 10,
       pathfindingBoardWidth: 50,
       selectedPathfindingAlgorithm: 'dfs',
+      currentPathfindingInput: 'start',
       pathfindingStart: undefined,
       pathfindingEnd: undefined,
       highlightedSortingPseudocodeLine: { procedure: -1, line: -1 },
       highlightedPathfindingPseudocodeLine: { procedure: -1, line: -1 },
       maxSortingValue: computed(state => Math.max(...state.sortingValues)),
+      setInitialSortingValues: action((state, values) => {
+        state.initialSortingValues = values;
+      }),
       setHighlightedSortingPseudocodeLine: action((state, highlight) => {
         state.highlightedSortingPseudocodeLine = highlight;
       }),
@@ -88,11 +108,11 @@ export default createStore<StoreModel>(
         state.selectedSortingAlgorithm = algo;
       }),
       resetSortingValues: action(state => {
-        state.sortingValues = [2, 3, 10, 4, 5, 3, 9, 5, 5, 3, 7];
+        location.reload();
+        state.sortingValues = state.initialSortingValues;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         state.sortingValuesClasses = state.sortingValues.map(_ => '');
         state.highlightedSortingPseudocodeLine = { procedure: -1, line: -1 };
-        location.reload();
       }),
       resetSortingValuesClasses: action(state => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -141,35 +161,94 @@ export default createStore<StoreModel>(
           }
         }
       }),
+      setCurrentPathfindingInput: action((state, type) => {
+        state.currentPathfindingInput = type;
+      }),
       setPathfindingStart: action((state, node) => {
-        state.pathfindingBoard[node.x][node.y].state = 'start';
-        state.pathfindingStart = state.pathfindingBoard[node.x][node.y];
+        if (node.y === state.pathfindingStart?.y && node.x === state.pathfindingStart?.x) {
+          state.pathfindingStart = undefined;
+          state.pathfindingBoard[node.y][node.x].state = 'unvisited';
+          return;
+        }
+        state.pathfindingBoard[node.y][node.x].cost = 1;
+        if (state.pathfindingStart !== undefined)
+          state.pathfindingBoard[state.pathfindingStart.y][state.pathfindingStart.x].state = 'unvisited';
+        state.pathfindingBoard[node.y][node.x].state = 'start';
+        state.pathfindingStart = state.pathfindingBoard[node.y][node.x];
       }),
       setPathfindingEnd: action((state, node) => {
-        state.pathfindingBoard[node.x][node.y].state = 'end';
-        state.pathfindingEnd = state.pathfindingBoard[node.x][node.y];
+        if (node.y === state.pathfindingEnd?.y && node.x === state.pathfindingEnd?.x) {
+          state.pathfindingEnd = undefined;
+          state.pathfindingBoard[node.y][node.x].state = 'unvisited';
+          return;
+        }
+        state.pathfindingBoard[node.y][node.x].cost = 1;
+        if (state.pathfindingEnd !== undefined)
+          state.pathfindingBoard[state.pathfindingEnd.y][state.pathfindingEnd.x].state = 'unvisited';
+        state.pathfindingBoard[node.y][node.x].state = 'end';
+        state.pathfindingEnd = state.pathfindingBoard[node.y][node.x];
+      }),
+      setPathfindingNodeAsWall: action((state, node) => {
+        state.pathfindingBoard[node.y][node.x].cost = 1;
+        state.pathfindingBoard[node.y][node.x].state =
+          state.pathfindingBoard[node.y][node.x].state === 'wall' ? '' : 'wall';
+      }),
+      setPathfindingNodeState: action((state, info) => {
+        state.pathfindingBoard[info.y][info.x].state = info.state;
+      }),
+      incrementPathfindingNodeCost: action((state, node) => {
+        const nodeInBoard = state.pathfindingBoard[node.y][node.x];
+        if (nodeInBoard.state === 'wall' || nodeInBoard.state === 'start' || nodeInBoard.state === 'end') return;
+        nodeInBoard.cost = nodeInBoard.cost + 1 > 9 ? 1 : ((nodeInBoard.cost + 1) as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9);
       }),
       setSelectedPathfindingAlgorithm: action((state, algo) => {
         state.selectedPathfindingAlgorithm = algo;
       }),
-      findPath: action(state => {
+      findPath: thunk(async (actions, payload, helper) => {
+        const state = helper.getState();
         if (state.pathfindingStart === undefined || state.pathfindingEnd === undefined) {
           alert('Potrzebne jest wskazanie początku i końca!');
           return;
         }
         switch (state.selectedPathfindingAlgorithm) {
           case 'bfs':
-            bfs(state.pathfindingBoard, state.pathfindingStart, state.simulationDelay);
-            break;
+            bfs(
+              state.pathfindingBoard,
+              state.pathfindingStart,
+              state.simulationDelay / 2,
+              actions.setPathfindingNodeState,
+              actions.setHighlightedPathfindingPseudocodeLine
+            );
+            return;
           case 'dfs':
-            dfs(state.pathfindingBoard, state.pathfindingStart, state.simulationDelay);
-            break;
+            dfs(
+              state.pathfindingBoard,
+              state.pathfindingStart,
+              state.simulationDelay / 2,
+              actions.setPathfindingNodeState,
+              actions.setHighlightedPathfindingPseudocodeLine
+            );
+            return;
           case 'dijkstra':
-            dijkstra(state.pathfindingBoard, state.pathfindingStart, state.pathfindingEnd, state.simulationDelay);
-            break;
+            dijkstra(
+              state.pathfindingBoard,
+              state.pathfindingStart,
+              state.pathfindingEnd,
+              state.simulationDelay / 2,
+              actions.setPathfindingNodeState,
+              actions.setHighlightedPathfindingPseudocodeLine
+            );
+            return;
           case 'a-star':
-            aStar(state.pathfindingBoard, state.pathfindingStart, state.pathfindingEnd, state.simulationDelay);
-            break;
+            aStar(
+              state.pathfindingBoard,
+              state.pathfindingStart,
+              state.pathfindingEnd,
+              state.simulationDelay / 2,
+              actions.setPathfindingNodeState,
+              actions.setHighlightedPathfindingPseudocodeLine
+            );
+            return;
         }
       }),
       setSortingValues: action((state, payload) => {
@@ -183,7 +262,7 @@ export default createStore<StoreModel>(
         const state = helper.getState();
         switch (state.selectedSortingAlgorithm) {
           case 'bubble':
-            await bubbleSort(
+            bubbleSort(
               state.sortingValuesClasses,
               state.sortingValues,
               state.simulationDelay,
