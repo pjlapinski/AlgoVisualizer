@@ -78,9 +78,9 @@ export default createStore<StoreModel>(
   persist(
     {
       simulationDelay: 200.0,
-      initialSortingValues: [2, 3, 10, 4, 5, 3, 9, 5, 5, 3, 7],
-      sortingValues: [2, 3, 10, 4, 5, 3, 9, 5, 5, 3, 7],
-      sortingValuesClasses: ['', '', '', '', '', '', '', '', '', '', ''],
+      initialSortingValues: [],
+      sortingValues: [],
+      sortingValuesClasses: [],
       selectedSortingAlgorithm: 'bubble',
       pathfindingBoard: [[]],
       pathfindingBoardHeight: 10,
@@ -103,25 +103,22 @@ export default createStore<StoreModel>(
       }),
       setSelectedSortingAlgorithm: action((state, algo) => {
         state.highlightedSortingPseudocodeLine = { procedure: -1, line: -1 };
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        state.sortingValuesClasses = state.sortingValues.map(_ => '');
+        state.sortingValuesClasses = state.sortingValues.map(() => '');
         state.selectedSortingAlgorithm = algo;
       }),
       resetSortingValues: action(state => {
-        location.reload();
         state.sortingValues = state.initialSortingValues;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        state.sortingValuesClasses = state.sortingValues.map(_ => '');
+        state.sortingValuesClasses = state.initialSortingValues.map(() => '');
         state.highlightedSortingPseudocodeLine = { procedure: -1, line: -1 };
       }),
       resetSortingValuesClasses: action(state => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        state.sortingValuesClasses = state.sortingValues.map(_ => '');
+        state.sortingValuesClasses = state.sortingValues.map(() => '');
       }),
       createEmptyPathfindingBoard: action(state => {
         state.pathfindingStart = undefined;
         state.pathfindingEnd = undefined;
         state.pathfindingBoard = [];
+        state.highlightedPathfindingPseudocodeLine = { line: -1, procedure: -1 };
         for (let i = 0; i < state.pathfindingBoardHeight; i++) {
           state.pathfindingBoard.push([]);
           for (let j = 0; j < state.pathfindingBoardWidth; j++) {

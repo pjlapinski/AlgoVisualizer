@@ -7,17 +7,13 @@ import SortingInputModal from './SortingInputModal';
 
 const SortingHeader = () => {
   const onVisualize = useStoreActions(state => state.sort);
-  const onReset = useStoreActions(state => state.resetSortingValues);
   const selectAlgo = useStoreActions(state => state.setSelectedSortingAlgorithm);
   const resetSortingValues = useStoreActions(state => state.resetSortingValues);
   const selected = useStoreState(state => state.selectedSortingAlgorithm);
   const [dataInputModal, setDataInputModal] = useState<Modal | null>(null);
 
   const onInsertDataClicked = () => dataInputModal?.show();
-  const onInputDataConfirmed = () => {
-    resetSortingValues();
-  };
-
+  const onInputDataConfirmed = () => resetSortingValues();
   useEffect(() => setDataInputModal(new Modal(document.getElementById('input-sorting-data-modal') as HTMLElement)), []);
 
   return (
@@ -26,7 +22,7 @@ const SortingHeader = () => {
       <AlgorithmHeader
         title='Algorytmy sortujące'
         onVisualize={onVisualize}
-        onReset={onReset}
+        onReset={() => location.reload()}
         onInsertData={onInsertDataClicked}
       >
         <select className='custom-select' value={selected} onChange={e => selectAlgo(e.target.value)}>

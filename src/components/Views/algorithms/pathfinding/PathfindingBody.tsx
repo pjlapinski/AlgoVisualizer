@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useStoreActions, useStoreState } from '../../../../store';
 import AlgorithmBody from '../shared/AlgorithmBody';
 import PathfindingNode from './PathfindingNode';
@@ -13,16 +13,19 @@ const PathfindingBody = () => {
   const currentInput = useStoreState(store => store.currentPathfindingInput);
   const lineHighlight = useStoreState(state => state.highlightedPathfindingPseudocodeLine);
 
+  const resetBoard = useStoreActions(store => store.createEmptyPathfindingBoard);
   const generateGraph = useStoreActions(store => store.generatePathfindingGraph);
-  const initBoard = useStoreActions(store => store.createEmptyPathfindingBoard);
   const incrementNodeCost = useStoreActions(store => store.incrementPathfindingNodeCost);
   const setNodeAsStart = useStoreActions(store => store.setPathfindingStart);
   const setNodeAsEnd = useStoreActions(store => store.setPathfindingEnd);
   const setNodeAsWall = useStoreActions(store => store.setPathfindingNodeAsWall);
 
+  // to ensure that data is always loaded from the store, and that it has time to load
+  const [doneTimes, setDoneTimes] = useState(0);
   useEffect(() => {
-    initBoard();
-  }, []);
+    if (doneTimes <= 2) resetBoard();
+    setDoneTimes(prev => prev + 1);
+  }, [board]);
 
   return (
     <AlgorithmBody>

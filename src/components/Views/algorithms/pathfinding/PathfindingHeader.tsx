@@ -7,7 +7,6 @@ import PathfindingInputModal from './PathfindingInputModal';
 
 const PathfindingHeader = () => {
   const clearGraph = useStoreActions(store => store.clearPathfindingVisuals);
-  const resetBoard = useStoreActions(store => store.createEmptyPathfindingBoard);
   const selectAlgo = useStoreActions(store => store.setSelectedPathfindingAlgorithm);
   const visualize = useStoreActions(store => store.findPath);
   const setCurrentPathfindingInput = useStoreActions(state => state.setCurrentPathfindingInput);
@@ -32,7 +31,6 @@ const PathfindingHeader = () => {
       }}
       onReset={() => {
         location.reload();
-        resetBoard();
       }}
       onInsertData={() => {
         inputModal?.show();
