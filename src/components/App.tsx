@@ -5,12 +5,14 @@ import store from '../store';
 import HomeView from './views/home/HomeView';
 import SortingView from './views/algorithms/sorting/SortingView';
 import PathfindingView from './views/algorithms/pathfinding/PathfindingView';
+import Sidebar from './optionsMenu/OptionsMenu';
 
 const App = () => {
   return (
     <StoreProvider store={store}>
       <BrowserRouter>
         <div className='vh-100'>
+          <Sidebar />
           <Route path='/' exact component={HomeView} />
           <Route path='/sorting' component={SortingView} />
           <Route path='/pathfinding' component={PathfindingView} />

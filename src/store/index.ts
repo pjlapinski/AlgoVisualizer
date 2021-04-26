@@ -31,6 +31,7 @@ export interface setNodeStateInfo {
 }
 
 interface StoreModel {
+  theme: 'dark' | 'light';
   simulationDelay: number;
   initialSortingValues: number[];
   sortingValues: number[];
@@ -46,6 +47,8 @@ interface StoreModel {
   highlightedSortingPseudocodeLine: LineHighlight;
   highlightedPathfindingPseudocodeLine: LineHighlight;
   maxSortingValue: Computed<StoreModel, number>;
+  switchTheme: Action<StoreModel>;
+  setSimulationDelay: Action<StoreModel, number>;
   setInitialSortingValues: Action<StoreModel, number[]>;
   setHighlightedSortingPseudocodeLine: Action<StoreModel, LineHighlight>;
   setHighlightedPathfindingPseudocodeLine: Action<StoreModel, LineHighlight>;
@@ -77,6 +80,7 @@ export const useStoreState = typedHooks.useStoreState;
 export default createStore<StoreModel>(
   persist(
     {
+      theme: 'light',
       simulationDelay: 200.0,
       initialSortingValues: [],
       sortingValues: [],
@@ -92,6 +96,12 @@ export default createStore<StoreModel>(
       highlightedSortingPseudocodeLine: { procedure: -1, line: -1 },
       highlightedPathfindingPseudocodeLine: { procedure: -1, line: -1 },
       maxSortingValue: computed(state => Math.max(...state.sortingValues)),
+      switchTheme: action(state => {
+        state.theme = state.theme === 'light' ? 'dark' : 'light';
+      }),
+      setSimulationDelay: action((state, value) => {
+        state.simulationDelay = value;
+      }),
       setInitialSortingValues: action((state, values) => {
         state.initialSortingValues = values;
       }),
