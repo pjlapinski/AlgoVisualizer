@@ -1,3 +1,8 @@
+$color-warning: #ffd000;
+$color-neutral: #b0e9ad;
+$color-danger: #ff3460;
+$color-success: #3cc44e;
+
 html,
 body {
   height: 100%;
@@ -46,51 +51,43 @@ body {
 }
 
 .pseudocode-highlight {
-  background-color: #ffd000;
+  background-color: $color-warning;
   width: fit-content;
 }
 
 .sorting-node {
   width: 50px;
   border: black solid 2px;
-  background-color: #b0e9ad;
-}
-
-.sorting-node-current {
-  background-color: #ffd000;
-}
-
-.sorting-node-sorted {
-  background-color: #ff3460;
-}
-
-.sorting-node-pivot {
-  background-color: #3cc44e;
+  background-color: $color-neutral;
+  &-current {
+    background-color: $color-warning;
+  }
+  &-sorted {
+    background-color: $color-danger;
+  }
+  &-pivot {
+    background-color: $color-success;
+  }
 }
 
 .pathfinding-node {
   background-color: white;
   border: 1px solid black;
-}
-
-.pathfinding-node-start {
-  background-color: #3cc44e;
-}
-
-.pathfinding-node-end {
-  background-color: #ff3460;
-}
-
-.pathfinding-node-wall {
-  background-color: #292929;
-}
-
-.pathfinding-node-visited {
-  background-color: #b0e9ad;
-}
-
-.pathfinding-node-path {
-  background-color: #ffd000;
+  &-start {
+    background-color: $color-success;
+  }
+  &-end {
+    background-color: $color-danger;
+  }
+  &-wall {
+    background-color: #292929;
+  }
+  &-visited {
+    background-color: $color-neutral;
+  }
+  &-path {
+    background-color: $color-warning;
+  }
 }
 
 .algorithm-select-box {
@@ -120,98 +117,52 @@ body {
   }
 }
 
+/* src: http://danielstern.ca/range.css/#/ */
 input[type='range'] {
   width: 100%;
   margin: 7.3px 0;
   background-color: transparent;
   -webkit-appearance: none;
-}
-
-input[type='range']:focus {
-  outline: none;
-}
-
-input[type='range']::-webkit-slider-runnable-track {
-  background: rgba(48, 113, 169, 0.78);
-  border: 0.2px solid #010101;
-  border-radius: 1.3px;
-  width: 100%;
-  height: 11.4px;
-  cursor: pointer;
-}
-
-input[type='range']::-webkit-slider-thumb {
-  margin-top: -7.5px;
-  width: 26px;
-  height: 26px;
-  background: #ffffff;
-  border: 1.8px solid #00001e;
-  border-radius: 15px;
-  cursor: pointer;
-  -webkit-appearance: none;
-}
-
-input[type='range']:focus::-webkit-slider-runnable-track {
-  background: #3781c1;
-}
-
-input[type='range']::-moz-range-track {
-  background: rgba(48, 113, 169, 0.78);
-  border: 0.2px solid #010101;
-  border-radius: 1.3px;
-  width: 100%;
-  height: 11.4px;
-  cursor: pointer;
-}
-
-input[type='range']::-moz-range-thumb {
-  width: 26px;
-  height: 26px;
-  background: #ffffff;
-  border: 1.8px solid #00001e;
-  border-radius: 15px;
-  cursor: pointer;
-}
-
-input[type='range']::-ms-track {
-  background: transparent;
-  border-color: transparent;
-  border-width: 8.2px 0;
-  color: transparent;
-  width: 100%;
-  height: 11.4px;
-  cursor: pointer;
-}
-
-input[type='range']::-ms-fill-lower {
-  background: #296191;
-  border: 0.2px solid #010101;
-  border-radius: 2.6px;
-}
-
-input[type='range']::-ms-fill-upper {
-  background: rgba(48, 113, 169, 0.78);
-  border: 0.2px solid #010101;
-  border-radius: 2.6px;
-}
-
-input[type='range']::-ms-thumb {
-  width: 26px;
-  height: 26px;
-  background: #ffffff;
-  border: 1.8px solid #00001e;
-  border-radius: 15px;
-  cursor: pointer;
-  margin-top: 0px;
-  /*Needed to keep the Edge thumb centred*/
-}
-
-input[type='range']:focus::-ms-fill-lower {
-  background: rgba(48, 113, 169, 0.78);
-}
-
-input[type='range']:focus::-ms-fill-upper {
-  background: #3781c1;
+  &::-webkit-slider-runnable-track {
+    background: rgba(48, 113, 169, 0.78);
+    border: 0.2px solid #010101;
+    border-radius: 1.3px;
+    width: 100%;
+    height: 11.4px;
+    cursor: pointer;
+  }
+  &::-webkit-slider-thumb {
+    margin-top: -7.5px;
+    width: 26px;
+    height: 26px;
+    background: #ffffff;
+    border: 1.8px solid #00001e;
+    border-radius: 15px;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+  &::-moz-range-track {
+    background: rgba(48, 113, 169, 0.78);
+    border: 0.2px solid #010101;
+    border-radius: 1.3px;
+    width: 100%;
+    height: 11.4px;
+    cursor: pointer;
+  }
+  &::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+    background: #ffffff;
+    border: 1.8px solid #00001e;
+    border-radius: 15px;
+    cursor: pointer;
+  }
+  &:focus {
+    outline: none;
+    &::-webkit-slider-runnable-track {
+      background: #3781c1;
+    }
+  }
 }
 
 @supports (-ms-ime-align: auto) {
