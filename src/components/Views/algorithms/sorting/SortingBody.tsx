@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useStoreActions, useStoreState } from '../../../../store';
-import AlgorithmBody from '../shared/AlgorithmBody';
+import React from 'react';
+import { useStoreState } from '../../../../store';
 import SortingNode from './SortingNode';
 import pseudocodes from '../../../../algorithms/pseudocodes/sorting';
 
@@ -13,19 +12,11 @@ const SortingBody = () => {
     state => state.sortingValuesClasses,
     () => false
   );
-  const resetSortingValues = useStoreActions(state => state.resetSortingValues);
   const chosenAlgo = useStoreState(state => state.selectedSortingAlgorithm);
   const lineHighlight = useStoreState(state => state.highlightedSortingPseudocodeLine);
 
-  // to ensure that data is always loaded from the store, and that it has time to load
-  const [doneTimes, setDoneTimes] = useState(0);
-  useEffect(() => {
-    if (doneTimes <= 2) resetSortingValues();
-    setDoneTimes(prev => prev + 1);
-  }, [sortingValues]);
-
   return (
-    <AlgorithmBody>
+    <div>
       <div className='d-flex vw-100'>
         <div className='row justify-content-center vw-50'>
           {sortingValues.map((value, index) => (
@@ -58,7 +49,7 @@ const SortingBody = () => {
           ))}
         </div>
       </div>
-    </AlgorithmBody>
+    </div>
   );
 };
 

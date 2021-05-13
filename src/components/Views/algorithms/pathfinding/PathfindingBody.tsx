@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useStoreActions, useStoreState } from '../../../../store';
-import AlgorithmBody from '../shared/AlgorithmBody';
 import PathfindingNode from './PathfindingNode';
 import pseudocodes from '../../../../algorithms/pseudocodes/pathfinding';
 
@@ -20,15 +19,12 @@ const PathfindingBody = () => {
   const setNodeAsEnd = useStoreActions(store => store.setPathfindingEnd);
   const setNodeAsWall = useStoreActions(store => store.setPathfindingNodeAsWall);
 
-  // to ensure that data is always loaded from the store, and that it has time to load
-  const [doneTimes, setDoneTimes] = useState(0);
   useEffect(() => {
-    if (doneTimes <= 2) resetBoard();
-    setDoneTimes(prev => prev + 1);
-  }, [board]);
+    resetBoard();
+  }, [resetBoard]);
 
   return (
-    <AlgorithmBody>
+    <div>
       {board.map((row, index) => (
         <div key={index} className='row p-0 m-0 flex-nowrap'>
           {row.map(node => (
@@ -72,7 +68,7 @@ const PathfindingBody = () => {
           ))}
         </ol>
       </div>
-    </AlgorithmBody>
+    </div>
   );
 };
 
